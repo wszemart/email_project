@@ -1,3 +1,7 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import Email, Mailbox, Template
+
+admin.site.register(Mailbox)
+admin.site.register(Template)
+admin.site.register(Email)
