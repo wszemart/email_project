@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "user_mailbox.apps.UserMailboxConfig",
+    "django.contrib.admin",
     "django_filters",
     "rest_framework",
     "environ",
