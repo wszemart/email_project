@@ -58,3 +58,4 @@ class Email(models.Model):
         help_text="Date sent - a field filled in after sending the message",
     )
     date = models.DateTimeField(default=timezone.now)
+    send_attempts = models.PositiveIntegerField(default=0)
