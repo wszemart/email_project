@@ -145,8 +145,58 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # CELERY SETTINGS
 
 CELERY_BROKER_URL = "redis://localhost:6379/0"
-CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+# CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+CELERY_RESULT_BACKEND = "django-db"
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TASK_SERIALIZER = "json"
 CELERY_TIMEZONE = "Europe/Poland"
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "standard": {
+            "format": "[%(asctime)s] %(levelname)s [%(name)s.%(lineno)d] %(message)s",
+        },
+    },
+    "handlers": {
+        "file": {
+            "level": "DEBUG",
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR / "logs/email.log",
+            "formatter": "standard",
+        },
+    },
+    "loggers": {
+        "django": {
+            "level": "WARNING",
+            "handlers": ["file"],
+            "propagate": True,
+        },
+        "django.request": {
+            "level": "WARNING",
+            "handlers": ["file"],
+            "propagate": True,
+        },
+        "django.db.backends": {
+            "level": "WARNING",
+            "handlers": ["file"],
+            "propagate": True,
+        },
+        "django.template": {
+            "level": "WARNING",
+            "handlers": ["file"],
+            "propagate": True,
+        },
+        "user_mailbox": {
+            "level": "DEBUG",
+            "handlers": ["file"],
+            "propagate": True,
+        },
+    },
+    "root": {
+        "level": "INFO",
+        "handlers": ["file"],
+    },
+}
