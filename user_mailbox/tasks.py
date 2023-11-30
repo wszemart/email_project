@@ -1,4 +1,5 @@
 import time
+from smtplib import SMTPException
 
 from celery import shared_task
 from django.core.mail import send_mail
@@ -33,7 +34,7 @@ def send_email_task(email_id):
         email.sent_date = timezone.now()
         email.save()
 
-    except Exception as e:
+    except SMTPException as e:
         email.send_attempts += 1
         email.save()
         raise e

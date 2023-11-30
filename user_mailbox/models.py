@@ -18,9 +18,11 @@ class Mailbox(models.Model):
         default=timezone.now,
         help_text="The value automatically changed upon mailbox update",
     )
-    sent = models.PositiveIntegerField(
-        help_text="A property returning the count of messages sent from the mailbox"
-    )
+
+    @property
+    def sent(self):
+        # return Email.objects.filter(mailbox=self)
+        return len(self.emails)
 
 
 class Template(models.Model):
@@ -37,7 +39,9 @@ class Template(models.Model):
 
 
 class Email(models.Model):
-    mailbox = models.ForeignKey(Mailbox, blank=False, on_delete=models.CASCADE)
+    mailbox = models.ForeignKey(
+        Mailbox, blank=False, on_delete=models.CASCADE, related_name="emails"
+    )
     template = models.ForeignKey(Template, blank=False, on_delete=models.CASCADE)
     to = ArrayField(models.EmailField(), blank=False, help_text="Recipient")
     cc = ArrayField(

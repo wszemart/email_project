@@ -1,5 +1,6 @@
 import logging
 
+from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
@@ -31,8 +32,8 @@ class EmailViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["post"])
     def send_email(self, request):
         try:
-            mailbox_id = request.data.get("mailbox_id")
-            template_id = request.data.get("template_id")
+            mailbox_id = request.data.get("mailbox")
+            template_id = request.data.get("template")
 
             mailbox = Mailbox.objects.get(pk=mailbox_id)
             template = Template.objects.get(pk=template_id)
@@ -44,7 +45,22 @@ class EmailViewSet(viewsets.ModelViewSet):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
-            email = Email.objects.create(mailbox=mailbox, template=template)
+            to_emails = request.data.get("to", [])
+            cc_emails = request.data.get("cc", [])
+            bcc_emails = request.data.get("bcc", [])
+            replay_to_emails = request.data.get("replay_to", "")
+            sent_date_email = timezone.now()
+
+            email = Email.objects.create(
+                mailbox=mailbox,
+                template=template,
+                to=to_emails,
+                cc=cc_emails,
+                bcc=bcc_emails,
+                replay_to=replay_to_emails,
+                sent_date=sent_date_email,
+            )
+
             send_email_task.delay(email.id)
 
             logger.info(f"Email sent successfully. Email ID: {email.id}")
@@ -54,8 +70,9 @@ class EmailViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_200_OK,
             )
         except Exception as e:
-            logger.exception(f"An error {e} occurred while sending email.")
+            raise e
+            logger.exception(f"An error {str(e)} occurred while sending email.")
             return Response(
-                {"error": "An error occurred while sending email."},
+                {"error": f"An error occurred while sending email. {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
