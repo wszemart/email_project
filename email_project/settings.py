@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "environ",
     "django_celery_results",
+    "rest_framework_swagger",
 ]
 
 MIDDLEWARE = [
@@ -200,3 +201,5 @@ LOGGING = {
         "handlers": ["file"],
     },
 }
+
+REST_FRAMEWORK = {"DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema"}
